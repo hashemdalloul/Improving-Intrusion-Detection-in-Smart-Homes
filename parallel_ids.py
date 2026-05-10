@@ -1,4 +1,4 @@
-﻿import pandas as pd
+import pandas as pd
 import numpy as np
 import joblib
 import warnings
@@ -70,22 +70,42 @@ for i in range(len(X)):
         sample2 = sample.reindex(columns=model2_cols, fill_value=0)
         sample3 = sample.reindex(columns=model3_cols, fill_value=0)
 
-        # تنبؤ الموديلات
+        # ================= Model 1 =================
         device_prediction = model1.predict(sample1)
-        malicious_prediction = model2.predict(sample2)
-        attack_prediction = model3.predict(sample3)
 
-        # تحويل رقم الهجوم إلى اسم
-        attack_name = model3_label_encoder.inverse_transform(
-            [int(attack_prediction[0])]
-        )[0]
+        # ================= Model 2 =================
+        malicious_prediction = model2.predict(sample2)
 
         # تحويل 0/1 إلى نص
         if malicious_prediction[0] == 1:
+
             malicious_text = "Malicious"
+
+            # ================= Model 3 =================
+            attack_prediction = model3.predict(sample3)
+
+            attack_name = model3_label_encoder.inverse_transform(
+                [int(attack_prediction[0])]
+            )[0]
+
         else:
+
             malicious_text = "Normal"
 
+            # إذا طبيعي لا يوجد هجوم
+            attack_name = "No Attack"
+
+        # ================= الطباعة =================
+        print(f"Sample {i+1}")
+        print("Device Type:", device_prediction[0])
+        print("Malicious/Normal:", malicious_text)
+        print("Attack Type:", attack_name)
+        print("-----------------------------------")
+
+    except Exception as e:
+        print(f"Error in sample {i+1}: {e}")
+
+        print("\nParallel IDS finished")
         # طباعة النتائج
         print(f"Sample {i+1}")
         print("Device Type:", device_prediction[0])
